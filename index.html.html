@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐢 Python Turtle Challenge</title>
+    <style>
+        :root {
+            --bg-color: #f4f7fe;
+            --card-bg: #ffffff;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #10b981;
+            --secondary-hover: #059669;
+            --accent: #f59e0b;
+            --accent-hover: #d97706;
+            --danger: #ef4444;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --code-bg: #1e1e2e;
+            --code-text: #a6adc8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #312e81;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #e0e7ff;
+            border-radius: 10px;
+            height: 14px;
+            margin: 20px 0;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #10b981);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .badge {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Card Content */
+        .card {
+            background-color: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 1.4rem;
+            color: #1e1b4b;
+            margin-bottom: 10px;
+        }
+
+        .card p, .card ul {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        .card ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        /* Code Editor */
+        .editor-container {
+            margin: 20px 0;
+        }
+
+        .editor-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            color: #374151;
+        }
+
+        textarea.code-editor {
+            width: 100%;
+            height: 220px;
+            background-color: var(--code-bg);
+            color: #f8f8f2;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 1.05rem;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #4338ca;
+            resize: vertical;
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            line-height: 1.5;
+        }
+
+        textarea.code-editor:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Buttons & Controls */
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .btn-secondary { background-color: #f3f4f6; color: #374151; border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background-color: #e5e7eb; }
+
+        .btn-accent { background-color: var(--accent); color: white; }
+        .btn-accent:hover { background-color: var(--accent-hover); }
+
+        .btn-success { background-color: var(--secondary); color: white; }
+        .btn-success:hover { background-color: var(--secondary-hover); }
+
+        /* Expandable Panels (Hint & Solution) */
+        .panel {
+            display: none;
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-left: 5px solid var(--accent);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .panel.solution {
+            background-color: #f0fdf4;
+            border-color: #dcfce7;
+            border-left-color: var(--secondary);
+        }
+
+        .panel-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: #f8f8f2;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-size: 0.95rem;
+        }
+
+        .code-keyword { color: #ff79c6; }
+        .code-func { color: #50fa7b; }
+        .code-num { color: #bd93f9; }
+        .code-str { color: #f1fa8c; }
+
+        /* Review Grid */
+        .review-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .review-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .review-item code {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            animation: fadeIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        /* Navigation Footer */
+        .nav-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 18px; }
+            .btn { width: 100%; justify-content: center; }
+            .btn-group { flex-direction: column; }
+            .nav-footer { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🐢 Python Turtle Challenge</h1>
+            <p class="subtitle">Latihan Coding Python Interaktif untuk Pemula (SD & SMP)</p>
+        </header>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div id="app"></div>
+    </div>
+
+    <div class="toast" id="toast">Kode berhasil disalin! 📋</div>
+
+    <script>
+        // Data Challenge & Quick Review
+        const quickReviewData = {
+            title: "Turtle Quick Review",
+            description: "Sebelum mulai menaklukan challenge, mari kita review perintah-perintah dasar Python Turtle yang bisa kamu gunakan!",
+            commands: [
+                { cmd: "forward(d)", desc: "Maju sejauh d langkah" },
+                { cmd: "left(a)", desc: "Belok kiri sebesar a derajat" },
+                { cmd: "right(a)", desc: "Belok kanan sebesar a derajat" },
+                { cmd: "circle(r)", desc: "Membuat lingkaran dengan jari-jari r" },
+                { cmd: "color('warna')", desc: "Mengubah warna garis/isian (cth: 'red', 'blue')" },
+                { cmd: "pensize(n)", desc: "Mengubah ketebalan garis menjadi n" },
+                { cmd: "goto(x, y)", desc: "Pindah langsung ke koordinat (x, y)" },
+                { cmd: "penup()", desc: "Angkat pena (pindah tanpa menggambar)" },
+                { cmd: "pendown()", desc: "Turunkan pena (mulai menggambar lagi)" },
+                { cmd: "begin_fill()", desc: "Mulai mengisi warna pada bentuk" },
+                { cmd: "end_fill()", desc: "Selesai mengisi warna pada bentuk" }
+            ],
+            imports: [
+                { type: "Cara 1 (Rekomendasi Ringkas):", code: "from turtle import *\n\nforward(100)\nleft(90)" },
+                { type: "Cara 2 (Sesuai Modul):", code: "import turtle\n\nturtle.forward(100)\nturtle.left(90)" }
+            ]
+        };
+
+        const challenges = [
+            {
+                id: 1,
+                title: "Tangga Sederhana",
+                task: "Buat turtle menggambar bentuk seperti tangga kecil 3 tingkat.\nMulai dengan maju 80 langkah, belok kiri 90°, maju 40 langkah, lalu belok kiri 90°.\nUlangi pola tersebut sampai terlihat seperti tangga dengan 3 tingkat.",
+                rules: "Gunakan urutan forward() dan left(). Jangan gunakan loop!",
+                hint: "💡 Pola tangga dibuat dengan mengulang: maju 80 → belok kiri 90 → maju 40 → belok kiri 90. Tuliskan urutan ini secara manual sebanyak 3 kali!",
+                solutionCode: "from turtle import *\n\n# Tingkat 1\nforward(80)\nleft(90)\nforward(40)\nleft(90)\n\n# Tingkat 2\nforward(80)\nleft(90)\nforward(40)\nleft(90)\n\n# Tingkat 3\nforward(80)\nleft(90)\nforward(40)\nleft(90)",
+                explanation: "Kode ini mengulang perintah maju dan belok sebanyak 3 kali secara berurutan untuk membentuk 3 anak tangga tanpa menggunakan loop."
+            },
+            {
+                id: 2,
+                title: "Rumah Tanpa Atap",
+                task: "Buat turtle menggambar pondasi rumah sederhana berbentuk persegi panjang (lebar 150, tinggi 100).\nBuat garis dasar, lalu belok kanan untuk membentuk dinding-dindingnya hingga kembali ke titik awal.",
+                rules: "Gunakan kombinasi forward() dan right().",
+                hint: "💡 Ingat, persegi panjang memiliki 4 sisi. Gunakan maju 150 untuk lebar, belok kanan 90, maju 100 untuk tinggi, dan ulangi sampai membentuk kotak!",
+                solutionCode: "from turtle import *\n\nforward(150)\nright(90)\nforward(100)\nright(90)\nforward(150)\nright(90)\nforward(100)\nright(90)",
+                explanation: "Turtle berjalan membentuk persegi panjang berukuran 150x100 pixels dengan selalu berbelok kanan 90 derajat di setiap sudutnya."
+            },
+            {
+                id: 3,
+                title: "Kotak dengan Warna dan Ketebalan",
+                task: "Buat sebuah kotak persegi dengan ukuran sisi 120.\nSet garis menjadi warna biru ('blue') dan ketebalan garis 5.\nIsi bagian dalam kotak dengan warna biru tersebut!",
+                rules: "Wajib menggunakan color(), pensize(), begin_fill(), end_fill(), forward(), dan right().",
+                hint: "💡 Letakkan begin_fill() dan pensize(5) SEBELUM membuat 4 sisi kotak, lalu panggil end_fill() SETELAH 4 sisi selesai dibuat.",
+                solutionCode: "from turtle import *\n\ncolor('blue')\npensize(5)\nbegin_fill()\n\nforward(120)\nright(90)\nforward(120)\nright(90)\nforward(120)\nright(90)\nforward(120)\nright(90)\n\nend_fill()",
+                explanation: "Atur warna dan ketebalan lebih dulu, panggil begin_fill(), buat 4 sisi kotak, lalu akhiri dengan end_fill() untuk mewarnai bagian dalam."
+            },
+            {
+                id: 4,
+                title: "Dua Bentuk Berbeda",
+                task: "Buat sebuah kotak persegi ukuran 80 terlebih dahulu.\nSetelah kotak selesai, berpindahlah ke koordinat (150, 50) TANPA membuat garis penghubung.\nDi tempat baru tersebut, buatlah sebuah lingkaran dengan jari-jari 40.",
+                rules: "Wajib menggunakan penup(), goto(), pendown(), dan circle().",
+                hint: "💡 Setelah kotak selesai, angkat pena dengan penup(), lalu gunakan goto(150, 50). Turunkan pena dengan pendown() sebelum menggambar circle(40)!",
+                solutionCode: "from turtle import *\n\n# Gambar Kotak\nforward(80)\nleft(90)\nforward(80)\nleft(90)\nforward(80)\nleft(90)\nforward(80)\nleft(90)\n\n# Pindah posisi tanpa menggambar\npenup()\ngoto(150, 50)\npendown()\n\n# Gambar Lingkaran\ncircle(40)",
+                explanation: "Perintah penup() mematikan mode gambar sehingga pergerakan goto() tidak meninggalkan garis. pendown() mengaktifkan kembali garis menggambar."
+            },
+            {
+                id: 5,
+                title: "Lampu Lalu Lintas",
+                task: "Buatlah gambar 3 lingkaran tersusun secara vertikal menyerupai lampu lalu lintas.\n- Lingkaran atas: merah ('red') di koordinat (0, 100)\n- Lingkaran tengah: kuning ('yellow') di koordinat (0, 0)\n- Lingkaran bawah: hijau ('green') di koordinat (0, -100)\nSemua lingkaran memiliki jari-jari 30.",
+                rules: "Gunakan penup(), goto(), pendown(), color(), dan circle(). Tidak perlu buat kotak luarnya.",
+                hint: "💡 Untuk setiap lingkaran: gunakan penup() → goto(x, y) → pendown() → color('warna') → circle(30).",
+                solutionCode: "from turtle import *\n\n# Lingkaran Merah (Atas)\npenup()\ngoto(0, 100)\npendown()\ncolor('red')\ncircle(30)\n\n# Lingkaran Kuning (Tengah)\npenup()\ngoto(0, 0)\npendown()\ncolor('yellow')\ncircle(30)\n\n# Lingkaran Hijau (Bawah)\npenup()\ngoto(0, -100)\npendown()\ncolor('green')\ncircle(30)",
+                explanation: "Turtle berpindah ke 3 titik koordinat vertikal berbeda tanpa menarik garis, lalu menggambar lingkaran dengan warna masing-masing."
+            },
+            {
+                id: 6,
+                title: "Tiga Lingkaran Berwarna",
+                task: "Buat 3 lingkaran dengan ukuran jari-jari sama yaitu 50, tetapi warna dan posisinya berbeda:\n1. Lingkaran Merah di koordinat (-120, 0)\n2. Lingkaran Biru di koordinat (0, 0)\n3. Lingkaran Hijau di koordinat (120, 0)\nPastikan TIDAK ADA garis penghubung antarlingkaran!",
+                rules: "Gunakan kombinasi color(), circle(), penup(), goto(), dan pendown().",
+                hint: "💡 Ingat selalu matikan pena dengan penup() saat berpindah dari satu titik lingkaran ke titik lingkaran berikutnya.",
+                solutionCode: "from turtle import *\n\n# Lingkaran 1: Merah\npenup()\ngoto(-120, 0)\npendown()\ncolor('red')\ncircle(50)\n\n# Lingkaran 2: Biru\npenup()\ngoto(0, 0)\npendown()\ncolor('blue')\ncircle(50)\n\n# Lingkaran 3: Hijau\npenup()\ngoto(120, 0)\npendown()\ncolor('green')\ncircle(50)",
+                explanation: "Menggabungkan pemindahan lokasi secara bersih menggunakan penup() & goto() dengan pengaturan warna color() untuk 3 lingkaran sejajar."
+            },
+            {
+                id: 7,
+                title: "Kotak Biru dan Lingkaran Merah",
+                task: "Buatlah sebuah kotak persegi berukuran 100 di posisi asal, berwarna biru ('blue') terisi penuh (fill), dengan ketebalan garis 3.\nKemudian pindah ke koordinat (150, -50), lalu buat lingkaran berwarna merah ('red') terisi penuh dengan jari-jari 40 dan ketebalan garis 6.",
+                rules: "Gunakan color(), pensize(), begin_fill(), end_fill(), penup(), goto(), pendown(), dan circle().",
+                hint: "💡 Jangan lupa bahwa setiap bentuk yang ingin diisi warna memerlukan pasangan begin_fill() di awal dan end_fill() di akhir bentuk tersebut!",
+                solutionCode: "from turtle import *\n\n# Kotak Biru\ncolor('blue')\npensize(3)\nbegin_fill()\nforward(100)\nleft(90)\nforward(100)\nleft(90)\nforward(100)\nleft(90)\nforward(100)\nleft(90)\nend_fill()\n\n# Pindah ke posisi baru\npenup()\ngoto(150, -50)\npendown()\n\n# Lingkaran Merah\ncolor('red')\npensize(6)\nbegin_fill()\ncircle(40)\nend_fill()",
+                explanation: "Setiap bentuk memiliki pengaturan warna, ketebalan (pensize), dan pemicu isian warna (begin_fill/end_fill) masing-masing secara terpisah."
+            },
+            {
+                id: 8,
+                title: "Target 🎯",
+                task: "Buatlah gambar Papan Target panahan yang terdiri dari 3 lingkaran terpusat (konsentris):\n1. Lingkaran luar: jari-jari 90, warna hitam ('black') di koordinat (0, -90)\n2. Lingkaran tengah: jari-jari 60, warna biru ('blue') di koordinat (0, -60)\n3. Lingkaran dalam (pusat): jari-jari 30, warna merah ('red') di koordinat (0, -30)",
+                rules: "Gunakan penup(), goto(), pendown(), color(), dan circle(). Perhatikan titik koordinatnya agar lingkaran konsentris teratur!",
+                hint: "💡 Karena fungsi circle(r) menggambar ke atas dari titik turtle, agar pusatnya sama di (0,0), titik awal koordinat Y harus berada di -r (misal: -90, -60, -30).",
+                solutionCode: "from turtle import *\n\n# Lingkaran Luar (Hitam)\npenup()\ngoto(0, -90)\npendown()\ncolor('black')\ncircle(90)\n\n# Lingkaran Tengah (Biru)\npenup()\ngoto(0, -60)\npendown()\ncolor('blue')\ncircle(60)\n\n# Lingkaran Dalam (Merah)\npenup()\ngoto(0, -30)\npendown()\ncolor('red')\ncircle(30)",
+                explanation: "Dengan memposisikan Y di minus jari-jari (-r), ketiga lingkaran akan memiliki titik pusat simetris yang sama persis di titik (0,0)."
+            },
+            {
+                id: 9,
+                title: "Mini Taman",
+                task: "Buat gambar sederhana mini taman yang berisi:\n- Pot Bunga: Persegi panjang warna cokelat ('brown') ukuran lebar 80, tinggi 40 di koordinat (-40, -80)\n- Batang Bunga: Garis lurus hijau ('green') dengan pensize(6) dari (0, -40) menuju ke (0, 40)\n- Bunga: Lingkaran kuning ('yellow') terisi warna dengan jari-jari 30 di posisi (0, 40)",
+                rules: "Gunakan pemindahan penup() & goto() agar pot, batang, dan bunga tersambung rapi tanpa garis bocor.",
+                hint: "💡 Urutan pembuatan: Pot Bunga → Batang (menggunakan forward/goto) → Bunga (menggunakan circle dengan fill).",
+                solutionCode: "from turtle import *\n\n# 1. Pot Bunga (Cokelat)\npenup()\ngoto(-40, -80)\npendown()\ncolor('brown')\nbegin_fill()\nforward(80)\nleft(90)\nforward(40)\nleft(90)\nforward(80)\nleft(90)\nforward(40)\nleft(90)\nend_fill()\n\n# 2. Batang Bunga (Hijau)\npenup()\ngoto(0, -40)\npendown()\ncolor('green')\npensize(6)\ngoto(0, 40)\n\n# 3. Bunga (Kuning)\npenup()\ngoto(0, 40)\npendown()\ncolor('yellow')\npensize(1)\nbegin_fill()\ncircle(30)\nend_fill()",
+                explanation: "Mengombinasikan bentuk persegi panjang terisi warna sebagai pot, garis tebal sebagai batang, dan lingkaran terisi warna sebagai kelopak bunga."
+            },
+            {
+                id: 10,
+                title: "Mini Drawing Challenge 🎨",
+                task: "Selamat! Ini adalah Challenge Terakhir!\nBuatlah sebuah gambar kreasi bebas yang menggabungkan minimal:\n- 3 Bentuk berbeda\n- Minimal 2 warna yang berbeda\n- Ada bagian yang diisi warna (begin_fill & end_fill)\n- Pengaturan ketebalan garis (pensize)\n- Penggunaan penup() & goto()\n- Minimal 1 lingkaran circle()\n\nKamu bebas berkreasi membuat robot, rumah, wajah, atau roket!",
+                rules: "Siswa bebas membuat kreasi sendiri selama memenuhi syarat di atas. Kunci jawaban di bawah hanyalah salah satu contoh kreasi (Wajah Sederhana).",
+                hint: "💡 Rencanakan gambarmu terlebih dahulu di kertas! Tentukan koordinat untuk kepala, mata, dan mulut sebelum menulis kode.",
+                solutionCode: "from turtle import *\n\n# 1. Kepala (Lingkaran Besar Kuning)\npenup()\ngoto(0, -100)\npendown()\ncolor('orange', 'yellow') # Garis oranye, isi kuning\npensize(4)\nbegin_fill()\ncircle(100)\nend_fill()\n\n# 2. Mata Kiri (Lingkaran Biru)\npenup()\ngoto(-35, 20)\npendown()\ncolor('blue')\nbegin_fill()\ncircle(15)\nend_fill()\n\n# 3. Mata Kanan (Lingkaran Biru)\npenup()\ngoto(35, 20)\npendown()\ncolor('blue')\nbegin_fill()\ncircle(15)\nend_fill()\n\n# 4. Mulut (Garis Merah Tebal)\npenup()\ngoto(-40, -30)\npendown()\ncolor('red')\npensize(8)\ngoto(40, -30)",
+                explanation: "Contoh kreasi di atas menggambar Wajah Senyum (Emoticon) yang memenuhi seluruh kriteria challenge menggunakan gabungan fungsi dasar Turtle."
+            }
+        ];
+
+        let currentStep = 0; // 0 = Review, 1..10 = Challenges, 11 = Completed
+        const userCodes = {}; // Menyimpan draf kode pengguna per challenge
+
+        // UI Element References
+        const app = document.getElementById('app');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const toast = document.getElementById('toast');
+
+        // Functions
+        function render() {
+            if (currentStep === 0) {
+                renderQuickReview();
+            } else if (currentStep >= 1 && currentStep <= 10) {
+                renderChallenge(currentStep);
+            } else {
+                renderCompletion();
+            }
+            updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateProgress() {
+            if (currentStep === 0 || currentStep > 10) {
+                progressContainer.style.display = 'none';
+            } else {
+                progressContainer.style.display = 'block';
+                const percentage = (currentStep / 10) * 100;
+                progressBar.style.width = percentage + '%';
+            }
+        }
+
+        function renderQuickReview() {
+            let commandsHTML = quickReviewData.commands.map(item => `
+                <div class="review-item">
+                    <code>${item.cmd}</code>
+                    <span>${item.desc}</span>
+                </div>
+            `).join('');
+
+            let importsHTML = quickReviewData.imports.map(item => `
+                <div style="margin-top: 10px;">
+                    <strong>${item.type}</strong>
+                    <pre>${escapeHTML(item.code)}</pre>
+                </div>
+            `).join('');
+
+            app.innerHTML = `
+                <div class="card">
+                    <h2>🐢 Turtle Quick Review</h2>
+                    <p>${quickReviewData.description}</p>
+                    <h3 style="margin-top: 15px; color: var(--primary);">Perintah Utama:</h3>
+                    <div class="review-grid">
+                        ${commandsHTML}
+                    </div>
+                    <h3 style="margin-top: 20px; color: var(--primary);">Cara Import Kode Python:</h3>
+                    <p>Siswa bebas menggunakan salah satu dari 2 cara import berikut:</p>
+                    ${importsHTML}
+                </div>
+                <div class="nav-footer">
+                    <div></div>
+                    <button class="btn btn-primary" onclick="goToStep(1)">Mulai Challenge 1 🚀</button>
+                </div>
+            `;
+        }
+
+        function renderChallenge(stepNum) {
+            const ch = challenges[stepNum - 1];
+            const savedCode = userCodes[stepNum] || "# Tulis kode kamu di sini\nfrom turtle import *\n\n";
+
+            app.innerHTML = `
+                <div class="step-header">
+                    <span>Challenge ${ch.id} / 10</span>
+                    <span class="badge">${ch.title}</span>
+                </div>
+
+                <div class="card">
+                    <h2>${ch.title}</h2>
+                    <p style="white-space: pre-line;"><strong>Tugas:</strong>\n${ch.task}</p>
+                    <p style="margin-top: 10px; color: #4b5563; font-style: italic;">📌 ${ch.rules}</p>
+                </div>
+
+                <div class="editor-container">
+                    <label class="editor-label" for="codeEditor">💻 Code Editor Python:</label>
+                    <textarea id="codeEditor" class="code-editor" spellcheck="false" oninput="saveCode(${stepNum}, this.value)">${escapeHTML(savedCode)}</textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-accent" onclick="togglePanel('hintPanel')">💡 Hint</button>
+                    <button class="btn btn-secondary" onclick="togglePanel('solutionPanel')">👀 Lihat Kunci Jawaban</button>
+                </div>
+
+                <div id="hintPanel" class="panel">
+                    <div class="panel-title">💡 Petunjuk (Hint):</div>
+                    <p>${ch.hint}</p>
+                </div>
+
+                <div id="solutionPanel" class="panel solution">
+                    <div class="panel-title">👀 Kunci Jawaban:</div>
+                    <pre id="solutionCodeText">${escapeHTML(ch.solutionCode)}</pre>
+                    <p style="margin-top: 8px;"><strong>Penjelasan:</strong> ${ch.explanation}</p>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-success" onclick="copyCode('${escapeJsString(ch.solutionCode)}')">📋 Copy Code</button>
+                    </div>
+                </div>
+
+                <div class="nav-footer">
+                    <button class="btn btn-secondary" onclick="goToStep(${stepNum - 1})">⬅️ Sebelumnya</button>
+                    <button class="btn btn-primary" onclick="goToStep(${stepNum + 1})">${stepNum === 10 ? 'Selesai 🎉' : 'Next Challenge ➡️'}</button>
+                </div>
+            `;
+        }
+
+        function renderCompletion() {
+            app.innerHTML = `
+                <div class="card" style="text-align: center; padding: 40px 20px;">
+                    <h2 style="font-size: 2rem; color: var(--secondary);">🎉 All Challenges Completed!</h2>
+                    <p style="font-size: 1.2rem; margin-top: 15px;">
+                        Hebat sekali! Kamu sudah berhasil menyelesaikan <strong>10 Python Turtle Challenges</strong>.
+                    </p>
+                    <p style="margin-top: 10px; color: var(--text-muted);">
+                        Sekarang kamu sudah mahir mengendalikan Turtle, mengatur warna, ketebalan, serta memindahkan posisi untuk membuat berbagai gambar keren!
+                    </p>
+                    <div class="btn-group" style="justify-content: center; margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="goToStep(0)">Review Challenges 🔄</button>
+                        <button class="btn btn-success" onclick="restartAll()">Restart Dari Awal 🚀</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function goToStep(step) {
+            currentStep = step;
+            render();
+        }
+
+        function saveCode(step, value) {
+            userCodes[step] = value;
+        }
+
+        function togglePanel(panelId) {
+            const panel = document.getElementById(panelId);
+            if (panel) {
+                if (panel.style.display === 'block') {
+                    panel.style.display = 'none';
+                } else {
+                    panel.style.display = 'block';
+                }
+            }
+        }
+
+        function copyCode(text) {
+            // Gunakan fallback execCommand agar kompatibel dalam iframe/standalone env
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+
+            showToast("Kode kunci jawaban berhasil disalin! 📋");
+        }
+
+        function showToast(msg) {
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2500);
+        }
+
+        function restartAll() {
+            for (let k in userCodes) delete userCodes[k];
+            currentStep = 0;
+            render();
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+
+        function escapeJsString(str) {
+            return str.replace(/\\/g, '\\\\')
+                      .replace(/'/g, "\\'")
+                      .replace(/\n/g, '\\n');
+        }
+
+        window.onload = function() {
+            render();
+        };
+    </script>
+</body>
+</html>
